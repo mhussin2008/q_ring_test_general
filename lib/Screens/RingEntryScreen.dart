@@ -31,15 +31,15 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
     //   CheckDbase();
     // });
 
-    CheckDbase().then((value) {
-      print(value);
-      return {
-        if (value == 'Ok')
-          {
-            GetFromDb().then((value) => {print('Loaded all data')})
-          }
-      };
-    });
+    // CheckDbase().then((value) {
+    //   print(value);
+    //   return {
+    //     if (value == 'Ok')
+    //       {
+    //         GetFromDb().then((value) => {print('Loaded all data')})
+    //       }
+    //   };
+    // });
   }
 
   @override
@@ -187,7 +187,10 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
                   ///////////////////////////////////////////
                   OutlinedButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                       print(dataSource.cols.length);
+                       print(dataSource.rows.length);
+                       print(dataSource.rows[0].getCells().length);
+                        // Navigator.pop(context);
                       },
                       child: const Text(
                         'عودة الى الشاشة الرئيسية',
