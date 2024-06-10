@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import '../Data/ringDataSource.dart';
-//import '../oldCode/QaryDataEntryScreen.dart';
+import '../Data/recordsDataSource.dart';
 import 'DialogScreen.dart';
 import '../Data/newDataModels.dart';
 
-class RingEntryScreen extends StatefulWidget {
+
+class dataEntryScreen extends StatefulWidget {
   final   int  index;
-  const RingEntryScreen({Key? key, required this.index}) : super(key: key);
+  const dataEntryScreen({Key? key, required this.index}) : super(key: key);
 
   @override
-  State<RingEntryScreen> createState() => _RingEntryScreenState();
+  State<dataEntryScreen> createState() => _dataEntryScreenState();
 }
 
-class _RingEntryScreenState extends State<RingEntryScreen> {
+class _dataEntryScreenState extends State<dataEntryScreen> {
   late List<TextEditingController> dataController ;
 
   @override
@@ -27,10 +27,8 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
     print('here');
    // print(widget.dataLink.runtimeType);
     dataController = List.generate(
-        data.inst[widget.index].getfieldsHeader.length, (index) => TextEditingController());
-    // WidgetsBinding.instance.addPostFrameCallback((_){
-    //   CheckDbase();
-    // });
+        data.inst[widget.index].Headers.length, (index) => TextEditingController());
+
 
     CheckDbase().then((value) {
       print(value);
@@ -55,15 +53,15 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
   @override
   Widget build(BuildContext context) {
     DataGridController dataGridController = DataGridController();
-    RingDataSource dataSource =
-        RingDataSource(widget.index);
+    RecordsDataSource dataSource =
+        RecordsDataSource(widget.index);
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           titleSpacing: 10.0,
-          title: const Text('صفحة إدخال بيانات الحلقات',
+          title:  Text('صفحة إدخال بيانات  ${data.inst[widget.index].pageName}',
               style: TextStyle(fontSize: 20)),
         ),
         body: SafeArea(
@@ -71,7 +69,7 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              for (int i = 0; i < data.inst[widget.index].getfieldsHeader.length; i++)
+              for (int i = 0; i < data.inst[widget.index].Headers.length; i++)
                 Column(
                   children: [
                     Row(
@@ -88,7 +86,7 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(data.inst[0].getfieldsArHeader[i]),
+                        Text(data.inst[0].ArHeaders[i]),
                       ],
                     ),
                     SizedBox(height: 10,)
@@ -105,7 +103,7 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
                       onPressed: () async {
 
 
-                        if (data.inst[widget.index].getringList.any((test) => test
+                        if (data.inst[widget.index].getRecordsList.any((test) => test
                             .dataList[0]
                             .contains(dataController[0].text))) {
                           Fluttertoast.showToast(
@@ -131,11 +129,11 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
                           setState(() {
                             // TestList.add(TestData.fromFields(
                             //     nameController.text, dateController.text));
-                            data.inst[widget.index].ringList.add(ringSingleRecord(
+                            data.inst[widget.index].RecordsList.add(dataSingleRecord(
                                 dataController
                                     .map((toElement) => toElement.text)
                                     .toList()));
-                            print(data.inst[widget.index].ringList);
+                            print(data.inst[widget.index].RecordsList);
                           });
 
                           String retVal = await CheckDbase();
@@ -158,14 +156,14 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
 
                           //nameController.text = '';
                           //dateController.text = '';
-                          data.inst[widget.index].getfieldsHeader.map((toElement) {
+                          data.inst[widget.index].Headers.map((toElement) {
                             toElement = '';
                           });
 
                           FocusManager.instance.primaryFocus?.unfocus();
                           //print(TestList.toString());
                           //print(TestList.length.toDouble());
-                          dataGridController.refreshRow(data.inst[widget.index].getfieldsHeader.length);
+                          dataGridController.refreshRow(data.inst[widget.index].Headers.length);
                           //dataGridController.scrollToRow(QaryList.length.toDouble());
 
                           // Navigator.pop(context);
@@ -228,7 +226,7 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
                               //         ?.getCells()
                               //         .first
                               //         .value);
-                              data.inst[widget.index].ringList.removeWhere((test)=>
+                              data.inst[widget.index].RecordsList.removeWhere((test)=>
                               test.dataList[0]==dataGridController.selectedRow
                                          ?.getCells()
                                          .first
@@ -292,7 +290,7 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
                             print('deleting');
                             setState(() {
                               //TestList.clear();
-                              data.inst[widget.index].ringList.clear();
+                              data.inst[widget.index].RecordsList.clear();
                             });
                             CheckDbase().then((value) async {
                               if (value == 'Ok') {
@@ -408,7 +406,7 @@ fields=fields.substring(0, fields.length - 1);
         await db.database.rawQuery('SELECT * FROM ${data.tableNames[widget.index]}');
     print(gotlist);
     setState(() {
-      data.inst[widget.index].ringList.clear();
+      data.inst[widget.index].RecordsList.clear();
       //TestList.clear();
     });
     if (gotlist.isNotEmpty) {
@@ -427,12 +425,12 @@ var hh= e.values.toList().cast<String>();
 print(hh);
 
            // print('_datalist=$_datalist');
-             data.inst[widget.index].ringList
-                 .add(ringSingleRecord(hh));
+             data.inst[widget.index].RecordsList
+                 .add(dataSingleRecord(hh));
           }
           ;
         });
-        print(data.inst[widget.index].ringList);
+        print(data.inst[widget.index].RecordsList);
       });
     }
   }

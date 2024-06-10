@@ -1,23 +1,21 @@
-
-
-
-class ringSingleRecord {
+class dataSingleRecord {
   final List<String> dataList;
-  ringSingleRecord(this.dataList);
+  dataSingleRecord(this.dataList);
 }
 
-class ringListClass{
+class dataListClass{
   final List<String> Headers;
   final List<String> ArHeaders;
-  List<ringSingleRecord> ringList=[];
+  final String pageName;
+  List<dataSingleRecord> RecordsList=[];
   //static List<String> fieldsHeader=['name','date','data'];
   //static List<String> fieldsArHeader=['اسم الحلقة','تاريخ إنشائها','بيانات'];
 
-  ringListClass(this.Headers, this.ArHeaders);
-  List<ringSingleRecord> get getringList=> ringList;
+  dataListClass(this.Headers, this.ArHeaders, this.pageName);
+  List<dataSingleRecord> get getRecordsList=> RecordsList;
 
-  List<String> get getfieldsArHeader=>ArHeaders;
-  List<String> get getfieldsHeader=>Headers;
+  //List<String> get getfieldsArHeader=>ArHeaders;
+  //List<String> get getfieldsHeader=>Headers;
 
   String get headersOrderedforCreation{
     String fields='';
@@ -42,23 +40,13 @@ class ringListClass{
 
 }
 class data{
-  static List<ringListClass> inst=[ringListClass(['name','date','data'],
-      ['اسم الحلقة','تاريخ إنشائها','بيانات']),
+  static List<dataListClass> inst=[dataListClass(['name','date','data'],
+      ['اسم الحلقة','تاريخ إنشائها','بيانات'],'الحلقات'),
 
-    ringListClass(['aname','adate'],
-        ['اسم','تاريخ'])
+    dataListClass(['aname','adate'],
+        ['اسم','تاريخ'],'الطلبة')
 
   ];
   static String dbaseName='ringdbase.db';
   static List<String> tableNames=['ringtable','studenttable'];
-}
-
-class studentSingleRecord{
-  final List<String> dataList;
-  studentSingleRecord(this.dataList);
-}
-
-class studentListClass{
-  static List<studentSingleRecord> studentList=[];
-  static List<String> fieldsHeader=['ring','name','age'];
 }

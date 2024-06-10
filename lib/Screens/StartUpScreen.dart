@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:q_ring_test/Screens/RingEntryScreen.dart';
+import 'package:q_ring_test/Screens/dataEntryScreen.dart';
 import 'package:sqflite/sqflite.dart';
 import '../Data/newDataModels.dart';
 import 'DialogScreen.dart';
@@ -45,7 +45,7 @@ class startUpScreenUpdated extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              RingEntryScreen( index: 1)));
+                              dataEntryScreen( index: 1)));
 
                   }
                 ,
@@ -59,7 +59,7 @@ class startUpScreenUpdated extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                 RingEntryScreen( index: 0)));
+                                 dataEntryScreen( index: 0)));
                   },
                   child: const Text('جدول الحلقات', style: TextStyle(fontSize: 24))),
 

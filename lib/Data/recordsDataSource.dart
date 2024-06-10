@@ -3,14 +3,14 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:collection/collection.dart';
 import 'newDataModels.dart';
 
-class RingDataSource extends DataGridSource {
+class RecordsDataSource extends DataGridSource {
   final int sourceIndex;
   List<DataGridRow> _ringGridRow = [];
   List<GridColumn> _ringGridCol = [];
 
-  RingDataSource(this.sourceIndex) {
+  RecordsDataSource(this.sourceIndex) {
 
-     _ringGridRow=data.inst[sourceIndex].getringList.mapIndexed<DataGridRow>((idx, element) =>
+     _ringGridRow=data.inst[sourceIndex].getRecordsList.mapIndexed<DataGridRow>((idx, element) =>
         DataGridRow(cells: element
         .dataList
         .mapIndexed((innerIndex, innerElement) => DataGridCell<String>(

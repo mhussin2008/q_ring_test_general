@@ -63,7 +63,7 @@ class DatabaseHelper {
   // and the value is the column value. The return value is the id of the
   // inserted row.
 
-  Future insert(ringSingleRecord row) async {
+  Future insert(dataSingleRecord row) async {
     // Get a reference to the database.
     final Database db = await database;
 
