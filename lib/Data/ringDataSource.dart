@@ -30,7 +30,7 @@ class RingDataSource extends DataGridSource {
                 child: Text(
                   '$element',
                 ))))
-        .toList();
+        .toList().reversed.toList();
   }
 
   @override

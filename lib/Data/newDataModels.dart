@@ -19,6 +19,27 @@ class ringListClass{
   List<String> get getfieldsArHeader=>ArHeaders;
   List<String> get getfieldsHeader=>Headers;
 
+  String get headersOrderedforCreation{
+    String fields='';
+    for(int i=0;i<Headers.length;i++){
+    fields=fields+ Headers[i]+' TEXT ,';
+    }
+    if(Headers.length>1){
+    fields=fields.substring(0, fields.length - 1);}
+
+    return fields;
+  }
+
+  String get headersOrdered{
+    String fields='';
+    for(int i=0;i<Headers.length;i++){
+      fields=fields+ Headers[i]+' ,';
+    }
+    if(Headers.length>1){
+      fields=fields.substring(0, fields.length - 1);}
+    return fields;
+  }
+
 }
 class data{
   static List<ringListClass> inst=[ringListClass(['name','date','data'],
@@ -28,7 +49,8 @@ class data{
         ['اسم','تاريخ'])
 
   ];
-
+  static String dbaseName='ringdbase.db';
+  static List<String> tableNames=['ringtable','studenttable'];
 }
 
 class studentSingleRecord{

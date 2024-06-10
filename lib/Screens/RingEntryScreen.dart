@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sqflite/sqflite.dart';
@@ -31,15 +32,15 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
     //   CheckDbase();
     // });
 
-    // CheckDbase().then((value) {
-    //   print(value);
-    //   return {
-    //     if (value == 'Ok')
-    //       {
-    //         GetFromDb().then((value) => {print('Loaded all data')})
-    //       }
-    //   };
-    // });
+    CheckDbase().then((value) {
+      print(value);
+      return {
+        if (value == 'Ok')
+          {
+            GetFromDb().then((value) => {print('Loaded all data')})
+          }
+      };
+    });
   }
 
   @override
@@ -330,29 +331,38 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
 
   Future<String> CheckDbase() async {
     var databasesPath = await getDatabasesPath();
-    var dbFilePath = '$databasesPath/qary_dbase.db';
+    var dbFilePath = '$databasesPath/${data.dbaseName}';
     var dbExists = File(dbFilePath).existsSync();
     if (dbExists == false) {
       print('no such database');
     } else {}
     late Database db;
-    db = await openDatabase('qary_dbase.db');
+    db = await openDatabase(data.dbaseName);
     if (db.isOpen == false) {
       print('cant open database');
       return 'No';
     }
     var tables = await db
-        .rawQuery('SELECT * FROM sqlite_master WHERE name="testtable";');
+        .rawQuery('SELECT * FROM sqlite_master WHERE name="${data.tableNames[widget.index]}";');
 
     if (tables.isEmpty) {
       // Create the table
       print('no such table');
+      String fields='';
+      for(int i=0;i<data.inst[widget.index].Headers.length;i++){
+        fields=fields+ data.inst[widget.index].Headers[i]+' TEXT ,';
+      }
+
+fields=fields.substring(0, fields.length - 1);
+      print(fields);
+
       try {
         await db.execute('''
-        create table testtable (
-        testname TEXT NOT NULL UNIQUE ,
-        testdate TEXT 
-       )''');
+        CREATE TABLE ${data.tableNames[widget.index]} (
+        ${fields}
+        )''');
+
+
       } catch (err) {
         if (err.toString().contains('DatabaseException') == true) {
           print(err.toString());
@@ -366,25 +376,36 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
 
   Future<void> AddtoDb() async {
     var databasesPath = await getDatabasesPath();
-    var dbFilePath = '$databasesPath/qary_dbase.db';
+    var dbFilePath = '$databasesPath/${data.dbaseName}';
     late Database db;
     db = await openDatabase(dbFilePath);
     String testdate = dataController[0].text; //dateController.text;
-    String line = ''' '${dataController[1].text}', '${testdate}' ''';
-    //String line='';
+    //String line = ''' '${dataController[1].text}', '${testdate}' ''';
+    String h;
+
+    String headersline=data.inst[widget.index].headersOrdered;
+
+    String line='';
+    for(int i=0;i<dataController.length;i++){
+      line=line+ "'" +dataController[i].text+"'"+' ,';
+    }
+    if(dataController.length>1){
+      line=line.substring(0, line.length - 1);}
+
     String insertString =
-        '''INSERT INTO testtable ( testname, testdate) VALUES ( ${line} )''';
+        '''INSERT INTO ${data.tableNames[widget.index]} ( ${headersline} ) VALUES ( ${line} )''';
+
     print(insertString);
     await db.execute(insertString);
   }
 
   Future<void> GetFromDb() async {
     var databasesPath = await getDatabasesPath();
-    var dbFilePath = '$databasesPath/qary_dbase.db';
+    var dbFilePath = '$databasesPath/${data.dbaseName}';
     late Database db;
     db = await openDatabase(dbFilePath);
     List<Map<String, dynamic>>? gotlist =
-        await db.database.rawQuery('SELECT * FROM testtable');
+        await db.database.rawQuery('SELECT * FROM ${data.tableNames[widget.index]}');
     print(gotlist);
     setState(() {
       data.inst[widget.index].ringList.clear();
@@ -394,10 +415,20 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
       setState(() {
         gotlist.forEach((e) {
           {
-            //QaryList.add(QaryData.fromJson(e));
-            //TestList.add(TestData.fromFields(e['testname'], e['testdate']));
-            data.inst[widget.index].ringList
-                .add(ringSingleRecord([e['testname'], e['testdate']]));
+
+            print('e length=${e.length}');
+            print('type is ${e.runtimeType}');
+var hh= e.values.toList().cast<String>();
+            // for(int _y=0;_y<hh.length;_y++){
+            //   print(hh[_y]);
+            // _datalist.add(hh[_y].toString());}
+            //  // print('v=$v  act=$action');
+            // };
+print(hh);
+
+           // print('_datalist=$_datalist');
+             data.inst[widget.index].ringList
+                 .add(ringSingleRecord(hh));
           }
           ;
         });
@@ -408,18 +439,18 @@ class _RingEntryScreenState extends State<RingEntryScreen> {
 
   Future<void> ClearDb() async {
     var databasesPath = await getDatabasesPath();
-    var dbFilePath = '$databasesPath/qary_dbase.db';
+    var dbFilePath = '$databasesPath/${data.dbaseName}';
     late Database db;
     db = await openDatabase(dbFilePath);
-    await db.database.rawQuery('DELETE FROM testtable');
+    await db.database.rawQuery('DELETE FROM ${data.tableNames[widget.index]}');
     setState(() {});
   }
 
   Future<void> DelSrowFromDb(String tname) async {
     var databasesPath = await getDatabasesPath();
-    var dbFilePath = '$databasesPath/qary_dbase.db';
+    var dbFilePath = '$databasesPath/${data.dbaseName}';
     late Database db;
     db = await openDatabase(dbFilePath);
-    await db.rawDelete('DELETE FROM testtable WHERE testname = ?', [tname]);
+    await db.rawDelete('DELETE FROM ${data.tableNames[widget.index]} WHERE testname = ?', [tname]);
   }
 }
