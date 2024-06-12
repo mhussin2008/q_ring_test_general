@@ -45,7 +45,7 @@ class startUpScreenUpdated extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              dataEntryScreen( index: 1)));
+                              const dataEntryScreen( index: 1)));
 
                   }
                 ,
@@ -59,7 +59,7 @@ class startUpScreenUpdated extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                 dataEntryScreen( index: 0)));
+                                 const dataEntryScreen( index: 0)));
                   },
                   child: const Text('جدول الحلقات', style: TextStyle(fontSize: 24))),
 
@@ -68,7 +68,7 @@ class startUpScreenUpdated extends StatelessWidget {
                 SystemChannels.platform.invokeMethod('SystemNavigator.pop');
               },
 
-                  child: Text('إنهاء البرنامج'))
+                  child: const Text('إنهاء البرنامج'))
               //SizedBox(height: 10),
 
             ],
@@ -80,7 +80,7 @@ class startUpScreenUpdated extends StatelessWidget {
 
   Future<void> deleteDB() async {
     var databasesPath = await getDatabasesPath();
-    var dbFilePath = '$databasesPath/qary_dbase.db';
+    var dbFilePath = '$databasesPath/${data.dbaseName}';
     var dbExists = File(dbFilePath).existsSync();
     if (dbExists == true) {
       print('found and deleted database');
