@@ -1,6 +1,12 @@
 class dataSingleRecord {
   final List<String> dataList;
   dataSingleRecord(this.dataList);
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return 'data: ${dataList.toString()}';
+  }
 }
 
 class dataListClass{
@@ -40,13 +46,14 @@ class dataListClass{
 
 }
 class data{
-  static List<dataListClass> inst=[dataListClass(['name','date','data'],
+  static List<dataListClass> inst=[dataListClass(['rname','date','data'],
       ['اسم الحلقة','تاريخ إنشائها','بيانات'],'الحلقات'),
 
-    dataListClass(['aname','adate'],
-        ['اسم','تاريخ'],'الطلبة')
+    dataListClass(['rname','aname','adate'],
+        ['اسم الحلقة','اسم الطالب','تاريخ الميلاد'],'الطلبة')
 
   ];
   static String dbaseName='ringdbase.db';
   static List<String> tableNames=['ringtable','studenttable'];
+  static List<bool> link=[false,true];
 }

@@ -10,7 +10,9 @@ import '../Data/newDataModels.dart';
 
 class dataEntryScreen extends StatefulWidget {
   final   int  index;
-  const dataEntryScreen({super.key, required this.index});
+  final bool subTable;
+  final String selected;
+  const dataEntryScreen({super.key, required this.index, this.subTable=false,  this.selected=''});
 
   @override
   State<dataEntryScreen> createState() => _dataEntryScreenState();
@@ -27,6 +29,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
    // print(widget.dataLink.runtimeType);
     dataController = List.generate(
         data.inst[widget.index].Headers.length, (index) => TextEditingController());
+    dataController[0].text=(widget.subTable==true)?widget.selected:'';
 
 
     CheckDbase().then((value) {
@@ -75,6 +78,8 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                       children: [
                         Expanded(
                           child: TextFormField(
+
+                            readOnly: (data.link[widget.index]==true && i==0)?true:false ,
                               style: const TextStyle(height: 0.5),
                               keyboardType: TextInputType.text,
                               textDirection: TextDirection.rtl,
@@ -85,7 +90,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(data.inst[0].ArHeaders[i]),
+                        Text(data.inst[widget.index].ArHeaders[i]),
                       ],
                     ),
                     SizedBox(height: 10,)
@@ -102,10 +107,12 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                     child: OutlinedButton(
                         onPressed: () async {
                     
-                    
-                          if (data.inst[widget.index].getRecordsList.any((test) => test
-                              .dataList[0]
-                              .contains(dataController[0].text))) {
+                    var si=( data.link[widget.index]==true)?1:0;
+                          if (
+
+                          data.inst[widget.index].getRecordsList.any((test) => test
+                              .dataList[si]
+                              .contains(dataController[si].text))) {
                             Fluttertoast.showToast(
                                 msg: "بيانات الحلقة موجودة بالفعل ",
                                 toastLength: Toast.LENGTH_SHORT,
@@ -141,10 +148,12 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                               print('ok');
                               await AddtoDb();
                             }
-                            for (int i = 0; i < dataController.length; i++) {
+                            // for (int i = 0; i < dataController.length; i++) {
+                            //   dataController[i].text = '';
+                            // }
+                            for(int i=si;i<data.inst[widget.index].Headers.length;i++){
                               dataController[i].text = '';
                             }
-                    
                             Fluttertoast.showToast(
                                 msg: "تم إضافة بيانات الطالب بنجاح ",
                                 toastLength: Toast.LENGTH_SHORT,
@@ -156,9 +165,11 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                     
                             //nameController.text = '';
                             //dateController.text = '';
-                            data.inst[widget.index].Headers.map((toElement) {
-                              toElement = '';
-                            });
+
+
+                            // data.inst[widget.index].Headers.map((toElement) {
+                            //   toElement = '';
+                            // });
                     
                             FocusManager.instance.primaryFocus?.unfocus();
                             //print(TestList.toString());
@@ -260,14 +271,15 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                               ?.getCells()
                               .first
                               .value);
-                          // postponed after editions
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (BuildContext context) =>
-                          //             qaryDataEntry(testName: Selected)
-                          //
-                          //     ));
+                          //postponed after editions
+                          if(widget.subTable==false){
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      dataEntryScreen(index: 1,subTable: true,selected: Selected)
+
+                              ));}
                         }
                         //Navigator.pop(context);
                       },
@@ -402,10 +414,21 @@ fields=fields.substring(0, fields.length - 1);
   Future<void> GetFromDb() async {
     var databasesPath = await getDatabasesPath();
     var dbFilePath = '$databasesPath/${data.dbaseName}';
+    List<Map<String, dynamic>>? gotlist=[];
     late Database db;
     db = await openDatabase(dbFilePath);
-    List<Map<String, dynamic>>? gotlist =
-        await db.database.rawQuery('SELECT * FROM ${data.tableNames[widget.index]}');
+    if(widget.subTable==true) {
+     String _queryText='''SELECT * FROM ${data.tableNames[widget.index]} WHERE ${data.inst[widget.index].Headers[0]}= '${widget.selected}' ''';
+     print(_queryText);
+     gotlist =
+      await db.database.rawQuery(_queryText
+          );
+    }else{
+      gotlist =
+      await db.database.rawQuery(
+          'SELECT * FROM ${data.tableNames[widget.index]}');
+    }
+
     print(gotlist);
     setState(() {
       data.inst[widget.index].RecordsList.clear();
@@ -413,7 +436,7 @@ fields=fields.substring(0, fields.length - 1);
     });
     if (gotlist.isNotEmpty) {
       setState(() {
-        gotlist.forEach((e) {
+        gotlist?.forEach((e) {
           {
 
             print('e length=${e.length}');
