@@ -257,7 +257,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                       )),
                   SizedBox(
                     width: 100,
-                    child: OutlinedButton(
+                    child: data.link[widget.index]==false?  OutlinedButton(
                       onPressed: () {
                         String Selected = '';
                         if (dataGridController.selectedRow != null) {
@@ -288,7 +288,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                         textAlign: TextAlign.center,
                         textDirection: TextDirection.rtl,
                       ),
-                    ),
+                    ):Spacer()
                   ),
                   SizedBox(
                     width: 100,
