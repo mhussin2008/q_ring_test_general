@@ -7,30 +7,32 @@ import '../Data/recordsDataSource.dart';
 import 'DialogScreen.dart';
 import '../Data/newDataModels.dart';
 
-
 class dataEntryScreen extends StatefulWidget {
-  final   int  index;
+  final int index;
   final bool subTable;
   final String selected;
-  const dataEntryScreen({super.key, required this.index, this.subTable=false,  this.selected=''});
+  const dataEntryScreen(
+      {super.key,
+      required this.index,
+      this.subTable = false,
+      this.selected = ''});
 
   @override
   State<dataEntryScreen> createState() => _dataEntryScreenState();
 }
 
 class _dataEntryScreenState extends State<dataEntryScreen> {
-  late List<TextEditingController> dataController ;
+  late List<TextEditingController> dataController;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     print('here');
-   // print(widget.dataLink.runtimeType);
-    dataController = List.generate(
-        data.inst[widget.index].Headers.length, (index) => TextEditingController());
-    dataController[0].text=(widget.subTable==true)?widget.selected:'';
-
+    // print(widget.dataLink.runtimeType);
+    dataController = List.generate(data.inst[widget.index].Headers.length,
+        (index) => TextEditingController());
+    dataController[0].text = (widget.subTable == true) ? widget.selected : '';
 
     CheckDbase().then((value) {
       print(value);
@@ -55,15 +57,14 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
   @override
   Widget build(BuildContext context) {
     DataGridController dataGridController = DataGridController();
-    RecordsDataSource dataSource =
-        RecordsDataSource(widget.index);
+    RecordsDataSource dataSource = RecordsDataSource(widget.index);
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           titleSpacing: 10.0,
-          title:  Text('صفحة إدخال بيانات  ${data.inst[widget.index].pageName}',
+          title: Text('صفحة إدخال بيانات  ${data.inst[widget.index].pageName}',
               style: TextStyle(fontSize: 20)),
         ),
         body: SafeArea(
@@ -78,8 +79,11 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                       children: [
                         Expanded(
                           child: TextFormField(
-
-                            readOnly: (data.link[widget.index]==true && i==0)?true:false ,
+                              scribbleEnabled: false,
+                              readOnly:
+                                  (data.link[widget.index] == true && i == 0)
+                                      ? true
+                                      : false,
                               style: const TextStyle(height: 0.5),
                               keyboardType: TextInputType.text,
                               textDirection: TextDirection.rtl,
@@ -93,7 +97,9 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                         Text(data.inst[widget.index].ArHeaders[i]),
                       ],
                     ),
-                    SizedBox(height: 10,)
+                    SizedBox(
+                      height: 10,
+                    )
                   ],
                 ),
               const SizedBox(
@@ -106,13 +112,10 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                   Expanded(
                     child: OutlinedButton(
                         onPressed: () async {
-                    
-                    var si=( data.link[widget.index]==true)?1:0;
-                          if (
-
-                          data.inst[widget.index].getRecordsList.any((test) => test
-                              .dataList[si]
-                              .contains(dataController[si].text))) {
+                          var si = (data.link[widget.index] == true) ? 1 : 0;
+                          if (data.inst[widget.index].getRecordsList.any(
+                              (test) => test.dataList[si]
+                                  .contains(dataController[si].text))) {
                             Fluttertoast.showToast(
                                 msg: "بيانات الحلقة موجودة بالفعل ",
                                 toastLength: Toast.LENGTH_SHORT,
@@ -123,7 +126,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                 fontSize: 16.0);
                             return;
                           }
-                    
+
                           //
                           bool empty = false;
                           dataController.forEach((element) {
@@ -131,18 +134,18 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                               empty = true;
                             }
                           });
-                    
+
                           if (empty == false) {
                             setState(() {
                               // TestList.add(TestData.fromFields(
                               //     nameController.text, dateController.text));
-                              data.inst[widget.index].RecordsList.add(dataSingleRecord(
-                                  dataController
+                              data.inst[widget.index].RecordsList.add(
+                                  dataSingleRecord(dataController
                                       .map((toElement) => toElement.text)
                                       .toList()));
                               print(data.inst[widget.index].RecordsList);
                             });
-                    
+
                             String retVal = await CheckDbase();
                             if (retVal == 'Ok') {
                               print('ok');
@@ -151,7 +154,9 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                             // for (int i = 0; i < dataController.length; i++) {
                             //   dataController[i].text = '';
                             // }
-                            for(int i=si;i<data.inst[widget.index].Headers.length;i++){
+                            for (int i = si;
+                                i < data.inst[widget.index].Headers.length;
+                                i++) {
                               dataController[i].text = '';
                             }
                             Fluttertoast.showToast(
@@ -162,21 +167,21 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                 backgroundColor: Colors.blueAccent,
                                 textColor: Colors.white,
                                 fontSize: 16.0);
-                    
+
                             //nameController.text = '';
                             //dateController.text = '';
-
 
                             // data.inst[widget.index].Headers.map((toElement) {
                             //   toElement = '';
                             // });
-                    
+
                             FocusManager.instance.primaryFocus?.unfocus();
                             //print(TestList.toString());
                             //print(TestList.length.toDouble());
-                            dataGridController.refreshRow(data.inst[widget.index].Headers.length);
+                            dataGridController.refreshRow(
+                                data.inst[widget.index].Headers.length);
                             //dataGridController.scrollToRow(QaryList.length.toDouble());
-                    
+
                             // Navigator.pop(context);
                           } else {
                             Fluttertoast.showToast(
@@ -209,7 +214,9 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                   //     )),
                 ],
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -239,12 +246,13 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                               //         ?.getCells()
                               //         .first
                               //         .value);
-                              data.inst[widget.index].RecordsList.removeWhere((test)=>
-                              test.dataList[0]==dataGridController.selectedRow
-                                         ?.getCells()
-                                         .first
-                                         .value
-                              );
+                              data.inst[widget.index].RecordsList.removeWhere(
+                                  (test) =>
+                                      test.dataList[0] ==
+                                      dataGridController.selectedRow
+                                          ?.getCells()
+                                          .first
+                                          .value);
                             });
                             await DelSrowFromDb(qname);
                           }
@@ -256,40 +264,43 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                         textAlign: TextAlign.center,
                       )),
                   SizedBox(
-                    width: 100,
-                    child: data.link[widget.index]==false?  OutlinedButton(
-                      onPressed: () {
-                        String Selected = '';
-                        if (dataGridController.selectedRow != null) {
-                          Selected = dataGridController.selectedRow!
-                              .getCells()
-                              .first
-                              .value
-                              .toString();
+                      width: 100,
+                      child: data.link[widget.index] == false
+                          ? OutlinedButton(
+                              onPressed: () {
+                                String Selected = '';
+                                if (dataGridController.selectedRow != null) {
+                                  Selected = dataGridController.selectedRow!
+                                      .getCells()
+                                      .first
+                                      .value
+                                      .toString();
 
-                          print(dataGridController.selectedRow
-                              ?.getCells()
-                              .first
-                              .value);
-                          //postponed after editions
-                          if(widget.subTable==false){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      dataEntryScreen(index: 1,subTable: true,selected: Selected)
-
-                              ));}
-                        }
-                        //Navigator.pop(context);
-                      },
-                      child: const Text(
-                        'إدخال بيانات\n الطلبة',
-                        textAlign: TextAlign.center,
-                        textDirection: TextDirection.rtl,
-                      ),
-                    ):Spacer()
-                  ),
+                                  print(dataGridController.selectedRow
+                                      ?.getCells()
+                                      .first
+                                      .value);
+                                  //postponed after editions
+                                  if (widget.subTable == false) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                dataEntryScreen(
+                                                    index: 1,
+                                                    subTable: true,
+                                                    selected: Selected)));
+                                  }
+                                }
+                                //Navigator.pop(context);
+                              },
+                              child: const Text(
+                                'إدخال بيانات\n الطلبة',
+                                textAlign: TextAlign.center,
+                                textDirection: TextDirection.rtl,
+                              ),
+                            )
+                          : Spacer()),
                   SizedBox(
                     width: 100,
                     child: OutlinedButton(
@@ -324,17 +335,16 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
               const SizedBox(height: 10),
               Expanded(
                 child: SfDataGrid(
-                  allowEditing: true,
-                  allowSorting: true,
-                  selectionMode: SelectionMode.single,
-                  columnWidthMode: ColumnWidthMode.fill,
-                  isScrollbarAlwaysShown: true,
-                  gridLinesVisibility: GridLinesVisibility.both,
-                  headerGridLinesVisibility: GridLinesVisibility.both,
-                  controller: dataGridController,
-                  source: dataSource,
-                  columns: dataSource.cols
-                ),
+                    allowEditing: true,
+                    allowSorting: true,
+                    selectionMode: SelectionMode.single,
+                    columnWidthMode: ColumnWidthMode.fill,
+                    isScrollbarAlwaysShown: true,
+                    gridLinesVisibility: GridLinesVisibility.both,
+                    headerGridLinesVisibility: GridLinesVisibility.both,
+                    controller: dataGridController,
+                    source: dataSource,
+                    columns: dataSource.cols),
               ),
             ],
           ),
@@ -354,18 +364,18 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
       print('cant open database');
       return 'No';
     }
-    var tables = await db
-        .rawQuery('SELECT * FROM sqlite_master WHERE name="${data.tableNames[widget.index]}";');
+    var tables = await db.rawQuery(
+        'SELECT * FROM sqlite_master WHERE name="${data.tableNames[widget.index]}";');
 
     if (tables.isEmpty) {
       // Create the table
       print('no such table');
-      String fields='';
-      for(int i=0;i<data.inst[widget.index].Headers.length;i++){
-        fields=fields+ data.inst[widget.index].Headers[i]+' TEXT ,';
+      String fields = '';
+      for (int i = 0; i < data.inst[widget.index].Headers.length; i++) {
+        fields = fields + data.inst[widget.index].Headers[i] + ' TEXT ,';
       }
 
-fields=fields.substring(0, fields.length - 1);
+      fields = fields.substring(0, fields.length - 1);
       print(fields);
 
       try {
@@ -373,14 +383,11 @@ fields=fields.substring(0, fields.length - 1);
         CREATE TABLE ${data.tableNames[widget.index]} (
         ${fields}
         )''');
-
-
       } catch (err) {
         if (err.toString().contains('DatabaseException') == true) {
           print(err.toString());
           return 'No';
         }
-
       }
     }
     return 'Ok';
@@ -395,14 +402,15 @@ fields=fields.substring(0, fields.length - 1);
     //String line = ''' '${dataController[1].text}', '${testdate}' ''';
     String h;
 
-    String headersline=data.inst[widget.index].headersOrdered;
+    String headersline = data.inst[widget.index].headersOrdered;
 
-    String line='';
-    for(int i=0;i<dataController.length;i++){
-      line=line+ "'" +dataController[i].text+"'"+' ,';
+    String line = '';
+    for (int i = 0; i < dataController.length; i++) {
+      line = line + "'" + dataController[i].text + "'" + ' ,';
     }
-    if(dataController.length>1){
-      line=line.substring(0, line.length - 1);}
+    if (dataController.length > 1) {
+      line = line.substring(0, line.length - 1);
+    }
 
     String insertString =
         '''INSERT INTO ${data.tableNames[widget.index]} ( ${headersline} ) VALUES ( ${line} )''';
@@ -414,19 +422,17 @@ fields=fields.substring(0, fields.length - 1);
   Future<void> GetFromDb() async {
     var databasesPath = await getDatabasesPath();
     var dbFilePath = '$databasesPath/${data.dbaseName}';
-    List<Map<String, dynamic>>? gotlist=[];
+    List<Map<String, dynamic>>? gotlist = [];
     late Database db;
     db = await openDatabase(dbFilePath);
-    if(widget.subTable==true) {
-     String _queryText='''SELECT * FROM ${data.tableNames[widget.index]} WHERE ${data.inst[widget.index].Headers[0]}= '${widget.selected}' ''';
-     print(_queryText);
-     gotlist =
-      await db.database.rawQuery(_queryText
-          );
-    }else{
-      gotlist =
-      await db.database.rawQuery(
-          'SELECT * FROM ${data.tableNames[widget.index]}');
+    if (widget.subTable == true) {
+      String _queryText =
+          '''SELECT * FROM ${data.tableNames[widget.index]} WHERE ${data.inst[widget.index].Headers[0]}= '${widget.selected}' ''';
+      print(_queryText);
+      gotlist = await db.database.rawQuery(_queryText);
+    } else {
+      gotlist = await db.database
+          .rawQuery('SELECT * FROM ${data.tableNames[widget.index]}');
     }
 
     print(gotlist);
@@ -438,20 +444,18 @@ fields=fields.substring(0, fields.length - 1);
       setState(() {
         gotlist?.forEach((e) {
           {
-
             print('e length=${e.length}');
             print('type is ${e.runtimeType}');
-var hh= e.values.toList().cast<String>();
+            var hh = e.values.toList().cast<String>();
             // for(int _y=0;_y<hh.length;_y++){
             //   print(hh[_y]);
             // _datalist.add(hh[_y].toString());}
             //  // print('v=$v  act=$action');
             // };
-print(hh);
+            print(hh);
 
-           // print('_datalist=$_datalist');
-             data.inst[widget.index].RecordsList
-                 .add(dataSingleRecord(hh));
+            // print('_datalist=$_datalist');
+            data.inst[widget.index].RecordsList.add(dataSingleRecord(hh));
           }
           ;
         });
@@ -474,6 +478,8 @@ print(hh);
     var dbFilePath = '$databasesPath/${data.dbaseName}';
     late Database db;
     db = await openDatabase(dbFilePath);
-    await db.rawDelete('DELETE FROM ${data.tableNames[widget.index]} WHERE testname = ?', [tname]);
+    await db.rawDelete(
+        'DELETE FROM ${data.tableNames[widget.index]} WHERE testname = ?',
+        [tname]);
   }
 }

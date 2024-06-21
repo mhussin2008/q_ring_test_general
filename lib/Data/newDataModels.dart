@@ -49,8 +49,8 @@ class data{
   static List<dataListClass> inst=[dataListClass(['rname','date','data'],
       ['اسم الحلقة','تاريخ إنشائها','بيانات'],'الحلقات'),
 
-    dataListClass(['rname','aname','adate'],
-        ['اسم الحلقة','اسم الطالب','تاريخ الميلاد'],'الطلبة')
+    dataListClass(['rname','aname','adate','behave','parent'],
+        ['اسم الحلقة','اسم الطالب','تاريخ الميلاد','السلوك','ولى الأمر'],'الطلبة')
 
   ];
   static String dbaseName='ringdbase.db';
