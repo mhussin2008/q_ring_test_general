@@ -23,7 +23,7 @@ class dataEntryScreen extends StatefulWidget {
 
 class _dataEntryScreenState extends State<dataEntryScreen> {
   late List<TextEditingController> dataController;
-  bool folded=false;
+  bool folded = false;
 
   @override
   void initState() {
@@ -63,33 +63,37 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          leading: IconButton(onPressed: () { setState(() {
-   folded=!folded;
- });
- },
-
-            icon: Icon(folded?Icons.add:Icons.add_circle),
-
+          leading: IconButton(
+            onPressed: () {
+              setState(() {
+                folded = !folded;
+              });
+            },
+            icon: Icon(folded ? Icons.add : Icons.add_circle),
           ),
-          actions: [IconButton(onPressed: (){
-            Navigator.pop(context);
-          }, icon: Icon(Icons.arrow_back))],
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back))
+          ],
           centerTitle: true,
           titleSpacing: 10.0,
           title: Text('صفحة إدخال بيانات  ${data.inst[widget.index].pageName}',
-              style: TextStyle(fontSize: 20)),
+              style: const TextStyle(fontSize: 20)),
         ),
-
         body: SafeArea(
           minimum: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-
-             if (folded) ...[for (int i = 0; i < data.inst[widget.index].Headers.length; i++)
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                if (folded) ...[
+                  for (int i = 0; i < data.inst[widget.index].Headers.length; i++)
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Row(
                         children: [
                           Expanded(
                             child: TextFormField(
@@ -111,238 +115,249 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                           Text(data.inst[widget.index].ArHeaders[i]),
                         ],
                       ),
-                  )
-             //else Container(),
-                  ,const SizedBox(
-                      height: 10,
                     )
-                ,
-
-              const SizedBox(
-                height: 10,
-              ),
-              OutlinedButton(
-                  onPressed: () async {
-                    var si = (data.link[widget.index] == true) ? 1 : 0;
-                    if (data.inst[widget.index].getRecordsList.any(
-                        (test) => test.dataList[si]
-                            .contains(dataController[si].text))) {
-                      Fluttertoast.showToast(
-                          msg: "بيانات الحلقة موجودة بالفعل ",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.blueAccent,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-                      return;
-                    }
-
-                    //
-                    bool empty = false;
-                    dataController.forEach((element) {
-                      if (element.text == '') {
-                        empty = true;
-                      }
-                    });
-
-                    if (empty == false) {
-                      setState(() {
-                        // TestList.add(TestData.fromFields(
-                        //     nameController.text, dateController.text));
-                        data.inst[widget.index].RecordsList.add(
-                            dataSingleRecord(dataController
-                                .map((toElement) => toElement.text)
-                                .toList()));
-                        print(data.inst[widget.index].RecordsList);
-                      });
-
-                      String retVal = await CheckDbase();
-                      if (retVal == 'Ok') {
-                        print('ok');
-                        await AddtoDb();
-                      }
-                      // for (int i = 0; i < dataController.length; i++) {
-                      //   dataController[i].text = '';
-                      // }
-                      for (int i = si;
-                          i < data.inst[widget.index].Headers.length;
-                          i++) {
-                        dataController[i].text = '';
-                      }
-                      Fluttertoast.showToast(
-                          msg: "تم إضافة بيانات الطالب بنجاح ",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.blueAccent,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-
-                      //nameController.text = '';
-                      //dateController.text = '';
-
-                      // data.inst[widget.index].Headers.map((toElement) {
-                      //   toElement = '';
-                      // });
-
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      //print(TestList.toString());
-                      //print(TestList.length.toDouble());
-                      dataGridController.refreshRow(
-                          data.inst[widget.index].Headers.length);
-                      //dataGridController.scrollToRow(QaryList.length.toDouble());
-
-                      // Navigator.pop(context);
-                    } else {
-                      Fluttertoast.showToast(
-                          msg: "بيانات الحلقة غير مكتملة",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-                    }
-                  },
-                  child: const Text(
-                    'حفظ البيانات',
-                    textAlign: TextAlign.center,
-                  )),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                  //else Container(),
+                  ,
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   OutlinedButton(
                       onPressed: () async {
-                        if (dataGridController.selectedRow != null) {
-                          String result = await showDialog(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  const DialogScreen());
-
-                          print(result);
-                          if (result == 'OK') {
-                            print(dataGridController.selectedRow
-                                ?.getCells()
-                                .first
-                                .value);
-                            String qname = dataGridController.selectedRow
-                                ?.getCells()
-                                .first
-                                .value;
-
-                            setState(() {
-                              // TestList.removeWhere((element) =>
-                              //     element.testName ==
-                              //     dataGridController.selectedRow
-                              //         ?.getCells()
-                              //         .first
-                              //         .value);
-                              data.inst[widget.index].RecordsList.removeWhere(
-                                  (test) =>
-                                      test.dataList[0] ==
-                                      dataGridController.selectedRow
-                                          ?.getCells()
-                                          .first
-                                          .value);
-                            });
-                            await DelSrowFromDb(qname);
+                        var si = (data.link[widget.index] == true) ? 1 : 0;
+                        if (data.inst[widget.index].getRecordsList.any((test) =>
+                            test.dataList[si]
+                                .contains(dataController[si].text))) {
+                          Fluttertoast.showToast(
+                              msg: "بيانات الحلقة موجودة بالفعل ",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.blueAccent,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                          return;
+                        }
+            
+                        //
+                        bool empty = false;
+                        dataController.forEach((element) {
+                          if (element.text == '') {
+                            empty = true;
                           }
-                          //Navigator.pop(context);
+                        });
+            
+                        if (empty == false) {
+                          setState(() {
+                            // TestList.add(TestData.fromFields(
+                            //     nameController.text, dateController.text));
+                            data.inst[widget.index].RecordsList.add(
+                                dataSingleRecord(dataController
+                                    .map((toElement) => toElement.text)
+                                    .toList()));
+                            print(data.inst[widget.index].RecordsList);
+                          });
+            
+                          String retVal = await CheckDbase();
+                          if (retVal == 'Ok') {
+                            print('ok');
+                            await AddtoDb();
+                          }
+                          // for (int i = 0; i < dataController.length; i++) {
+                          //   dataController[i].text = '';
+                          // }
+                          for (int i = si;
+                              i < data.inst[widget.index].Headers.length;
+                              i++) {
+                            dataController[i].text = '';
+                          }
+                          Fluttertoast.showToast(
+                              msg: "تم إضافة بيانات الطالب بنجاح ",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.blueAccent,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+            
+                          //nameController.text = '';
+                          //dateController.text = '';
+            
+                          // data.inst[widget.index].Headers.map((toElement) {
+                          //   toElement = '';
+                          // });
+            
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          //print(TestList.toString());
+                          //print(TestList.length.toDouble());
+                          dataGridController
+                              .refreshRow(data.inst[widget.index].Headers.length);
+                          //dataGridController.scrollToRow(QaryList.length.toDouble());
+            
+                          // Navigator.pop(context);
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "بيانات الحلقة غير مكتملة",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
                         }
                       },
                       child: const Text(
-                        'مسح بيانات \n الحلقة',
+                        'حفظ البيانات',
                         textAlign: TextAlign.center,
                       )),
-                  SizedBox(
-                      width: 100,
-                      child: data.link[widget.index] == false
-                          ? OutlinedButton(
-                              onPressed: () {
-                                String Selected = '';
-                                if (dataGridController.selectedRow != null) {
-                                  Selected = dataGridController.selectedRow!
-                                      .getCells()
-                                      .first
-                                      .value
-                                      .toString();
-
-                                  print(dataGridController.selectedRow
-                                      ?.getCells()
-                                      .first
-                                      .value);
-                                  //postponed after editions
-                                  if (widget.subTable == false) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                dataEntryScreen(
-                                                    index: 1,
-                                                    subTable: true,
-                                                    selected: Selected)));
-                                  }
-                                }
-                                //Navigator.pop(context);
-                              },
-                              child: const Text(
-                                'إدخال بيانات\n الطلبة',
-                                textAlign: TextAlign.center,
-                                textDirection: TextDirection.rtl,
-                              ),
-                            )
-                          : SizedBox()),
-                  SizedBox(
-                    width: 100,
-                    child: OutlinedButton(
-                        onPressed: () async {
-                          String result = await showDialog(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  const DialogScreen());
-
-                          print(result);
-                          if (result == 'OK') {
-                            print('deleting');
-                            setState(() {
-                              //TestList.clear();
-                              data.inst[widget.index].RecordsList.clear();
-                            });
-                            CheckDbase().then((value) async {
-                              if (value == 'Ok') {
-                                await ClearDb();
-                              }
-                              ;
-                            });
-                          }
-                        },
-                        child: const Text(
-                          'مسح الجدول \n بالكامل',
-                          textAlign: TextAlign.center,
-                        )),
+                  const SizedBox(
+                    height: 20,
                   ),
-                ],
-              ),
-              const SizedBox(height: 10)]
-             else Container(),
-              Expanded(
-                child: SfDataGrid(
-                    allowEditing: true,
-                    allowSorting: true,
-                    selectionMode: SelectionMode.single,
-                    columnWidthMode: ColumnWidthMode.fill,
-                    isScrollbarAlwaysShown: true,
-                    gridLinesVisibility: GridLinesVisibility.both,
-                    headerGridLinesVisibility: GridLinesVisibility.both,
-                    controller: dataGridController,
-                    source: dataSource,
-                    columns: dataSource.cols),
-              ),
-            ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      OutlinedButton(
+                          onPressed: () async {
+                            if (dataGridController.selectedRow != null) {
+                              String result = await showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      const DialogScreen());
+            
+                              print(result);
+                              if (result == 'OK') {
+                                print(dataGridController.selectedRow
+                                    ?.getCells()
+                                    .first
+                                    .value);
+                                String qname = dataGridController.selectedRow
+                                    ?.getCells()
+                                    .first
+                                    .value;
+            
+                                setState(() {
+                                  // TestList.removeWhere((element) =>
+                                  //     element.testName ==
+                                  //     dataGridController.selectedRow
+                                  //         ?.getCells()
+                                  //         .first
+                                  //         .value);
+                                  data.inst[widget.index].RecordsList.removeWhere(
+                                      (test) =>
+                                          test.dataList[0] ==
+                                          dataGridController.selectedRow
+                                              ?.getCells()
+                                              .first
+                                              .value);
+                                });
+                                await DelSrowFromDb(qname);
+                              }
+                              //Navigator.pop(context);
+                            }
+                          },
+                          child: const Text(
+                            'مسح بيانات \n الحلقة',
+                            textAlign: TextAlign.center,
+                          )),
+                      SizedBox(
+                          width: 100,
+                          child: data.link[widget.index] == false
+                              ? OutlinedButton(
+                                  onPressed: () {
+                                    String Selected = '';
+                                    if (dataGridController.selectedRow != null) {
+                                      Selected = dataGridController.selectedRow!
+                                          .getCells()
+                                          .first
+                                          .value
+                                          .toString();
+            
+                                      print(dataGridController.selectedRow
+                                          ?.getCells()
+                                          .first
+                                          .value);
+                                      //postponed after editions
+                                      if (widget.subTable == false) {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (BuildContext context) =>
+                                                    dataEntryScreen(
+                                                        index: 1,
+                                                        subTable: true,
+                                                        selected: Selected)));
+                                      }
+                                    }
+                                    //Navigator.pop(context);
+                                  },
+                                  child: const Text(
+                                    'إدخال بيانات\n الطلبة',
+                                    textAlign: TextAlign.center,
+                                    textDirection: TextDirection.rtl,
+                                  ),
+                                )
+                              : const SizedBox()),
+                      SizedBox(
+                        width: 100,
+                        child: OutlinedButton(
+                            onPressed: () async {
+                              String result = await showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      const DialogScreen());
+            
+                              print(result);
+                              if (result == 'OK') {
+                                print('deleting');
+                                setState(() {
+                                  //TestList.clear();
+                                  data.inst[widget.index].RecordsList.clear();
+                                });
+                                CheckDbase().then((value) async {
+                                  if (value == 'Ok') {
+                                    await ClearDb();
+                                  }
+                                  ;
+                                });
+                              }
+                            },
+                            child: const Text(
+                              'مسح الجدول \n بالكامل',
+                              textAlign: TextAlign.center,
+                            )),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10)
+                ] else
+                  Container(),
+                SizedBox(
+                  height: 200,
+                  child: SfDataGrid(
+                    shrinkWrapRows: true,
+                      allowEditing: true,
+                      allowSorting: true,
+                      selectionMode: SelectionMode.single,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      isScrollbarAlwaysShown: true,
+                      gridLinesVisibility: GridLinesVisibility.both,
+                      headerGridLinesVisibility: GridLinesVisibility.both,
+                      controller: dataGridController,
+                      source: dataSource,
+                      columns: dataSource.cols),
+                ),
+            
+            OutlinedButton(onPressed: (){
+            
+            },
+                child: Text('إضافة يوم'))
+            
+            
+            
+              ],
+            ),
           ),
         ));
   }

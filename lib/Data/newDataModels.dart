@@ -8,7 +8,7 @@ class dataSingleRecord {
     return 'data: ${dataList.toString()}';
   }
 }
-
+/////////////////////////
 class dataListClass{
   final List<String> Headers;
   final List<String> ArHeaders;
@@ -45,15 +45,22 @@ class dataListClass{
   }
 
 }
+//////////////////////////////////////////////////
 class data{
   static List<dataListClass> inst=[dataListClass(['rname','date','data'],
       ['اسم الحلقة','تاريخ إنشائها','بيانات'],'الحلقات'),
 
     dataListClass(['rname','aname','adate','behave','parent'],
         ['اسم الحلقة','اسم الطالب','تاريخ الميلاد','السلوك','ولى الأمر'],'الطلبة'),
-    
+
+
+    dataListClass(['rname','sessiondate','aname','presence','saving','recovery'], [
+      'اسم الحلقة','تاريخ الحلقة','اسم الطالب','الحضور','الحفظ','المراجعةشححم'
+    ], 'الحصص')
 
   ];
+
+
   static String dbaseName='ringdbase.db';
   static List<String> tableNames=['ringtable','studenttable'];
   static List<bool> link=[false,true];
