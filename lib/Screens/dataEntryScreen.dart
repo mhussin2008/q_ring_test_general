@@ -23,6 +23,7 @@ class dataEntryScreen extends StatefulWidget {
 
 class _dataEntryScreenState extends State<dataEntryScreen> {
   late List<TextEditingController> dataController;
+  bool folded=false;
 
   @override
   void initState() {
@@ -62,158 +63,152 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
+          leading: IconButton(onPressed: () { setState(() {
+   folded=!folded;
+ });
+ },
+
+            icon: Icon(folded?Icons.add:Icons.add_circle),
+
+          ),
+          actions: [IconButton(onPressed: (){
+            Navigator.pop(context);
+          }, icon: Icon(Icons.arrow_back))],
           centerTitle: true,
           titleSpacing: 10.0,
           title: Text('صفحة إدخال بيانات  ${data.inst[widget.index].pageName}',
               style: TextStyle(fontSize: 20)),
         ),
+
         body: SafeArea(
           minimum: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              for (int i = 0; i < data.inst[widget.index].Headers.length; i++)
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                              scribbleEnabled: false,
-                              readOnly:
-                                  (data.link[widget.index] == true && i == 0)
-                                      ? true
-                                      : false,
-                              style: const TextStyle(height: 0.5),
-                              keyboardType: TextInputType.text,
-                              textDirection: TextDirection.rtl,
-                              controller: dataController[i],
-                              decoration: const InputDecoration(
-                                  border: OutlineInputBorder())),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(data.inst[widget.index].ArHeaders[i]),
-                      ],
-                    ),
-                    SizedBox(
+
+             if (folded) ...[for (int i = 0; i < data.inst[widget.index].Headers.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                                scribbleEnabled: false,
+                                readOnly:
+                                    (data.link[widget.index] == true && i == 0)
+                                        ? true
+                                        : false,
+                                style: const TextStyle(height: 0.5),
+                                keyboardType: TextInputType.text,
+                                textDirection: TextDirection.rtl,
+                                controller: dataController[i],
+                                decoration: const InputDecoration(
+                                    border: OutlineInputBorder())),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(data.inst[widget.index].ArHeaders[i]),
+                        ],
+                      ),
+                  )
+             //else Container(),
+                  ,const SizedBox(
                       height: 10,
                     )
-                  ],
-                ),
+                ,
+
               const SizedBox(
                 height: 10,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ///////////////////////////////////
-                  Expanded(
-                    child: OutlinedButton(
-                        onPressed: () async {
-                          var si = (data.link[widget.index] == true) ? 1 : 0;
-                          if (data.inst[widget.index].getRecordsList.any(
-                              (test) => test.dataList[si]
-                                  .contains(dataController[si].text))) {
-                            Fluttertoast.showToast(
-                                msg: "بيانات الحلقة موجودة بالفعل ",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.blueAccent,
-                                textColor: Colors.white,
-                                fontSize: 16.0);
-                            return;
-                          }
+              OutlinedButton(
+                  onPressed: () async {
+                    var si = (data.link[widget.index] == true) ? 1 : 0;
+                    if (data.inst[widget.index].getRecordsList.any(
+                        (test) => test.dataList[si]
+                            .contains(dataController[si].text))) {
+                      Fluttertoast.showToast(
+                          msg: "بيانات الحلقة موجودة بالفعل ",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.blueAccent,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
+                      return;
+                    }
 
-                          //
-                          bool empty = false;
-                          dataController.forEach((element) {
-                            if (element.text == '') {
-                              empty = true;
-                            }
-                          });
+                    //
+                    bool empty = false;
+                    dataController.forEach((element) {
+                      if (element.text == '') {
+                        empty = true;
+                      }
+                    });
 
-                          if (empty == false) {
-                            setState(() {
-                              // TestList.add(TestData.fromFields(
-                              //     nameController.text, dateController.text));
-                              data.inst[widget.index].RecordsList.add(
-                                  dataSingleRecord(dataController
-                                      .map((toElement) => toElement.text)
-                                      .toList()));
-                              print(data.inst[widget.index].RecordsList);
-                            });
+                    if (empty == false) {
+                      setState(() {
+                        // TestList.add(TestData.fromFields(
+                        //     nameController.text, dateController.text));
+                        data.inst[widget.index].RecordsList.add(
+                            dataSingleRecord(dataController
+                                .map((toElement) => toElement.text)
+                                .toList()));
+                        print(data.inst[widget.index].RecordsList);
+                      });
 
-                            String retVal = await CheckDbase();
-                            if (retVal == 'Ok') {
-                              print('ok');
-                              await AddtoDb();
-                            }
-                            // for (int i = 0; i < dataController.length; i++) {
-                            //   dataController[i].text = '';
-                            // }
-                            for (int i = si;
-                                i < data.inst[widget.index].Headers.length;
-                                i++) {
-                              dataController[i].text = '';
-                            }
-                            Fluttertoast.showToast(
-                                msg: "تم إضافة بيانات الطالب بنجاح ",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.blueAccent,
-                                textColor: Colors.white,
-                                fontSize: 16.0);
+                      String retVal = await CheckDbase();
+                      if (retVal == 'Ok') {
+                        print('ok');
+                        await AddtoDb();
+                      }
+                      // for (int i = 0; i < dataController.length; i++) {
+                      //   dataController[i].text = '';
+                      // }
+                      for (int i = si;
+                          i < data.inst[widget.index].Headers.length;
+                          i++) {
+                        dataController[i].text = '';
+                      }
+                      Fluttertoast.showToast(
+                          msg: "تم إضافة بيانات الطالب بنجاح ",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.blueAccent,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
 
-                            //nameController.text = '';
-                            //dateController.text = '';
+                      //nameController.text = '';
+                      //dateController.text = '';
 
-                            // data.inst[widget.index].Headers.map((toElement) {
-                            //   toElement = '';
-                            // });
+                      // data.inst[widget.index].Headers.map((toElement) {
+                      //   toElement = '';
+                      // });
 
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            //print(TestList.toString());
-                            //print(TestList.length.toDouble());
-                            dataGridController.refreshRow(
-                                data.inst[widget.index].Headers.length);
-                            //dataGridController.scrollToRow(QaryList.length.toDouble());
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      //print(TestList.toString());
+                      //print(TestList.length.toDouble());
+                      dataGridController.refreshRow(
+                          data.inst[widget.index].Headers.length);
+                      //dataGridController.scrollToRow(QaryList.length.toDouble());
 
-                            // Navigator.pop(context);
-                          } else {
-                            Fluttertoast.showToast(
-                                msg: "بيانات الحلقة غير مكتملة",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.CENTER,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.red,
-                                textColor: Colors.white,
-                                fontSize: 16.0);
-                          }
-                        },
-                        child: const Text(
-                          'حفظ البيانات',
-                          textAlign: TextAlign.center,
-                        )),
-                  ),
-
-                  ///////////////////////////////////////////
-                  // OutlinedButton(
-                  //     onPressed: () {
-                  //      print(dataSource.cols.length);
-                  //      print(dataSource.rows.length);
-                  //      print(dataSource.rows[0].getCells().length);
-                  //       // Navigator.pop(context);
-                  //     },
-                  //     child: const Text(
-                  //       'عودة الى الشاشة الرئيسية',
-                  //       textAlign: TextAlign.center,
-                  //     )),
-                ],
-              ),
+                      // Navigator.pop(context);
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: "بيانات الحلقة غير مكتملة",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
+                    }
+                  },
+                  child: const Text(
+                    'حفظ البيانات',
+                    textAlign: TextAlign.center,
+                  )),
               SizedBox(
                 height: 20,
               ),
@@ -300,7 +295,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                 textDirection: TextDirection.rtl,
                               ),
                             )
-                          : Spacer()),
+                          : SizedBox()),
                   SizedBox(
                     width: 100,
                     child: OutlinedButton(
@@ -332,7 +327,8 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 10)]
+             else Container(),
               Expanded(
                 child: SfDataGrid(
                     allowEditing: true,
