@@ -47,7 +47,8 @@ class dataListClass{
 }
 //////////////////////////////////////////////////
 class data{
-  static List<dataListClass> inst=[dataListClass(['rname','date','data'],
+  static List<dataListClass> inst= [
+    dataListClass(['rname','date','data'],
       ['اسم الحلقة','تاريخ إنشائها','بيانات'],'الحلقات'),
 
     dataListClass(['rname','aname','adate','behave','parent'],
@@ -55,13 +56,13 @@ class data{
 
 
     dataListClass(['rname','sessiondate','aname','presence','saving','recovery'], [
-      'اسم الحلقة','تاريخ الحلقة','اسم الطالب','الحضور','الحفظ','المراجعةشححم'
+      'اسم الحلقة','تاريخ الحلقة','اسم الطالب','الحضور','الحفظ','المراجعة'
     ], 'الحصص')
 
   ];
 
 
   static String dbaseName='ringdbase.db';
-  static List<String> tableNames=['ringtable','studenttable'];
+  static List<String> tableNames=['ringtable','studenttable','sessions'];
   static List<bool> link=[false,true];
 }

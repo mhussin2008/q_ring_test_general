@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:sqflite/sqflite.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../Data/recordsDataSource.dart';
@@ -35,12 +36,12 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
         (index) => TextEditingController());
     dataController[0].text = (widget.subTable == true) ? widget.selected : '';
 
-    CheckDbase().then((value) {
+    CheckDbase(widget.index).then((value) {
       print(value);
       return {
         if (value == 'Ok')
           {
-            GetFromDb().then((value) => {print('Loaded all data')})
+            GetFromDb(widget.index).then((value) => {print('Loaded all data')})
           }
       };
     });
@@ -58,7 +59,10 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
   @override
   Widget build(BuildContext context) {
     DataGridController dataGridController = DataGridController();
+    DataGridController dataGridController2 = DataGridController();
+
     RecordsDataSource dataSource = RecordsDataSource(widget.index);
+    RecordsDataSource dataSource2 = RecordsDataSource(2);
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -90,7 +94,9 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 if (folded) ...[
-                  for (int i = 0; i < data.inst[widget.index].Headers.length; i++)
+                  for (int i = 0;
+                      i < data.inst[widget.index].Headers.length;
+                      i++)
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Row(
@@ -140,7 +146,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                               fontSize: 16.0);
                           return;
                         }
-            
+
                         //
                         bool empty = false;
                         dataController.forEach((element) {
@@ -148,7 +154,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                             empty = true;
                           }
                         });
-            
+
                         if (empty == false) {
                           setState(() {
                             // TestList.add(TestData.fromFields(
@@ -159,11 +165,11 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                     .toList()));
                             print(data.inst[widget.index].RecordsList);
                           });
-            
-                          String retVal = await CheckDbase();
+
+                          String retVal = await CheckDbase(widget.index);
                           if (retVal == 'Ok') {
                             print('ok');
-                            await AddtoDb();
+                            await AddtoDb(widget.index);
                           }
                           // for (int i = 0; i < dataController.length; i++) {
                           //   dataController[i].text = '';
@@ -181,21 +187,21 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                               backgroundColor: Colors.blueAccent,
                               textColor: Colors.white,
                               fontSize: 16.0);
-            
+
                           //nameController.text = '';
                           //dateController.text = '';
-            
+
                           // data.inst[widget.index].Headers.map((toElement) {
                           //   toElement = '';
                           // });
-            
+
                           FocusManager.instance.primaryFocus?.unfocus();
                           //print(TestList.toString());
                           //print(TestList.length.toDouble());
-                          dataGridController
-                              .refreshRow(data.inst[widget.index].Headers.length);
+                          dataGridController.refreshRow(
+                              data.inst[widget.index].Headers.length);
                           //dataGridController.scrollToRow(QaryList.length.toDouble());
-            
+
                           // Navigator.pop(context);
                         } else {
                           Fluttertoast.showToast(
@@ -225,7 +231,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                   context: context,
                                   builder: (BuildContext context) =>
                                       const DialogScreen());
-            
+
                               print(result);
                               if (result == 'OK') {
                                 print(dataGridController.selectedRow
@@ -236,7 +242,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                     ?.getCells()
                                     .first
                                     .value;
-            
+
                                 setState(() {
                                   // TestList.removeWhere((element) =>
                                   //     element.testName ==
@@ -244,8 +250,8 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                   //         ?.getCells()
                                   //         .first
                                   //         .value);
-                                  data.inst[widget.index].RecordsList.removeWhere(
-                                      (test) =>
+                                  data.inst[widget.index].RecordsList
+                                      .removeWhere((test) =>
                                           test.dataList[0] ==
                                           dataGridController.selectedRow
                                               ?.getCells()
@@ -267,13 +273,14 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                               ? OutlinedButton(
                                   onPressed: () {
                                     String Selected = '';
-                                    if (dataGridController.selectedRow != null) {
+                                    if (dataGridController.selectedRow !=
+                                        null) {
                                       Selected = dataGridController.selectedRow!
                                           .getCells()
                                           .first
                                           .value
                                           .toString();
-            
+
                                       print(dataGridController.selectedRow
                                           ?.getCells()
                                           .first
@@ -283,11 +290,13 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (BuildContext context) =>
-                                                    dataEntryScreen(
-                                                        index: 1,
-                                                        subTable: true,
-                                                        selected: Selected)));
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        dataEntryScreen(
+                                                            index: 1,
+                                                            subTable: true,
+                                                            selected:
+                                                                Selected)));
                                       }
                                     }
                                     //Navigator.pop(context);
@@ -307,7 +316,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                   context: context,
                                   builder: (BuildContext context) =>
                                       const DialogScreen());
-            
+
                               print(result);
                               if (result == 'OK') {
                                 print('deleting');
@@ -315,7 +324,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                                   //TestList.clear();
                                   data.inst[widget.index].RecordsList.clear();
                                 });
-                                CheckDbase().then((value) async {
+                                CheckDbase(widget.index).then((value) async {
                                   if (value == 'Ok') {
                                     await ClearDb();
                                   }
@@ -336,7 +345,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                 SizedBox(
                   height: 200,
                   child: SfDataGrid(
-                    shrinkWrapRows: true,
+                      shrinkWrapRows: true,
                       allowEditing: true,
                       allowSorting: true,
                       selectionMode: SelectionMode.single,
@@ -348,21 +357,92 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
                       source: dataSource,
                       columns: dataSource.cols),
                 ),
-            
-            OutlinedButton(onPressed: (){
-            
-            },
-                child: Text('إضافة يوم'))
-            
-            
-            
+                Row(
+                  children: [
+                    OutlinedButton(onPressed: (){
+                      print(data.inst[2].RecordsList);
+                    }, child: Text('go')),
+
+                    OutlinedButton(
+                        onPressed: () async {
+                          String Selected = '';
+                          if (dataGridController.selectedRow != null) {
+                            Selected = dataGridController.selectedRow!
+                                .getCells()
+                                .first
+                                .value
+                                .toString();
+
+                            DateTime? dt = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now().add(Duration(days: -365)),
+                                lastDate: DateTime.now().add(Duration(days: 365)));
+                            if (dt != null) {
+                              String formattedDate =
+                                  intl.DateFormat('dd-MMMM-yyy').format(dt!);
+
+                              print(formattedDate);
+                              print(widget.index);
+
+                              if (await CheckDbase(2) == 'Ok') {
+                                GetFromDb(1);
+                                if (data.inst[1].RecordsList.length > 0) {
+                                  String rname1 = dataGridController.selectedRow!
+                                      .getCells()
+                                      .first.value
+                                      .toString();
+                                  print('******** $rname1');
+
+                                  List<String> args = [];
+                                  for (int i = 0;
+                                      i < data.inst[1].RecordsList.length;
+                                      i++) {
+                                    args = [];
+                                    args.add(rname1);
+                                    args.add(formattedDate);
+                                    args.add(
+                                        data.inst[1].RecordsList[i].dataList[1]);
+                                    args.add('');
+                                    args.add('');
+                                    args.add('');
+                                    await AddtoDb(2, args);
+                                    print('every thing is ok');
+
+                                    setState(() {
+                                      data.inst[2].RecordsList.add(dataSingleRecord(args));
+                                    });
+
+                                  }
+
+
+                                }
+                              }
+                            }
+                          }
+                        },
+                        child: Text('إضافة يوم')),
+                  ],
+                ),
+                SfDataGrid(
+                    shrinkWrapRows: true,
+                    allowEditing: true,
+                    allowSorting: true,
+                    selectionMode: SelectionMode.single,
+                    columnWidthMode: ColumnWidthMode.fill,
+                    isScrollbarAlwaysShown: true,
+                    gridLinesVisibility: GridLinesVisibility.both,
+                    headerGridLinesVisibility: GridLinesVisibility.both,
+                    controller: dataGridController2,
+                    source: dataSource2,
+                    columns: dataSource2.cols)
               ],
             ),
           ),
         ));
   }
 
-  Future<String> CheckDbase() async {
+  Future<String> CheckDbase(int idx) async {
     var databasesPath = await getDatabasesPath();
     var dbFilePath = '$databasesPath/${data.dbaseName}';
     var dbExists = File(dbFilePath).existsSync();
@@ -376,14 +456,14 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
       return 'No';
     }
     var tables = await db.rawQuery(
-        'SELECT * FROM sqlite_master WHERE name="${data.tableNames[widget.index]}";');
+        'SELECT * FROM sqlite_master WHERE name="${data.tableNames[idx]}";');
 
     if (tables.isEmpty) {
       // Create the table
       print('no such table');
       String fields = '';
-      for (int i = 0; i < data.inst[widget.index].Headers.length; i++) {
-        fields = fields + data.inst[widget.index].Headers[i] + ' TEXT ,';
+      for (int i = 0; i < data.inst[idx].Headers.length; i++) {
+        fields = fields + data.inst[idx].Headers[i] + ' TEXT ,';
       }
 
       fields = fields.substring(0, fields.length - 1);
@@ -391,9 +471,10 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
 
       try {
         await db.execute('''
-        CREATE TABLE ${data.tableNames[widget.index]} (
+        CREATE TABLE ${data.tableNames[idx]} (
         ${fields}
         )''');
+        print('table successfully created');
       } catch (err) {
         if (err.toString().contains('DatabaseException') == true) {
           print(err.toString());
@@ -404,7 +485,7 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
     return 'Ok';
   }
 
-  Future<void> AddtoDb() async {
+  Future<void> AddtoDb(int idx, [List<String> args = const ['']]) async {
     var databasesPath = await getDatabasesPath();
     var dbFilePath = '$databasesPath/${data.dbaseName}';
     late Database db;
@@ -413,24 +494,35 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
     //String line = ''' '${dataController[1].text}', '${testdate}' ''';
     String h;
 
-    String headersline = data.inst[widget.index].headersOrdered;
+    String headersline = data.inst[idx].headersOrdered;
 
     String line = '';
-    for (int i = 0; i < dataController.length; i++) {
-      line = line + "'" + dataController[i].text + "'" + ' ,';
+
+    if (idx < 2) {
+      for (int i = 0; i < dataController.length; i++) {
+        line = line + "'" + dataController[i].text + "'" + ' ,';
+      }
+    } else {
+      for (int i = 0; i < args.length; i++) {
+        line = line + "'" + args[i] + "'" + ' ,';
+      }
     }
-    if (dataController.length > 1) {
+
+    if (dataController.length > 1 && idx < 2) {
+      line = line.substring(0, line.length - 1);
+    }
+    if (args.length > 1 && idx == 2) {
       line = line.substring(0, line.length - 1);
     }
 
     String insertString =
-        '''INSERT INTO ${data.tableNames[widget.index]} ( ${headersline} ) VALUES ( ${line} )''';
+        '''INSERT INTO ${data.tableNames[idx]} ( ${headersline} ) VALUES ( ${line} )''';
 
     print(insertString);
     await db.execute(insertString);
   }
 
-  Future<void> GetFromDb() async {
+  Future<void> GetFromDb(int idx) async {
     var databasesPath = await getDatabasesPath();
     var dbFilePath = '$databasesPath/${data.dbaseName}';
     List<Map<String, dynamic>>? gotlist = [];
@@ -438,17 +530,17 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
     db = await openDatabase(dbFilePath);
     if (widget.subTable == true) {
       String _queryText =
-          '''SELECT * FROM ${data.tableNames[widget.index]} WHERE ${data.inst[widget.index].Headers[0]}= '${widget.selected}' ''';
+          '''SELECT * FROM ${data.tableNames[idx]} WHERE ${data.inst[idx].Headers[0]}= '${widget.selected}' ''';
       print(_queryText);
       gotlist = await db.database.rawQuery(_queryText);
     } else {
-      gotlist = await db.database
-          .rawQuery('SELECT * FROM ${data.tableNames[widget.index]}');
+      gotlist =
+          await db.database.rawQuery('SELECT * FROM ${data.tableNames[idx]}');
     }
 
     print(gotlist);
     setState(() {
-      data.inst[widget.index].RecordsList.clear();
+      data.inst[idx].RecordsList.clear();
       //TestList.clear();
     });
     if (gotlist.isNotEmpty) {
@@ -466,11 +558,11 @@ class _dataEntryScreenState extends State<dataEntryScreen> {
             print(hh);
 
             // print('_datalist=$_datalist');
-            data.inst[widget.index].RecordsList.add(dataSingleRecord(hh));
+            data.inst[idx].RecordsList.add(dataSingleRecord(hh));
           }
           ;
         });
-        print(data.inst[widget.index].RecordsList);
+        print(data.inst[idx].RecordsList);
       });
     }
   }
